@@ -1,15 +1,18 @@
 (ns clj-opencv-swing-example.core
   (:import [java.awt.image BufferedImage]
            [javax.swing JFrame JLabel ImageIcon WindowConstants SwingUtilities]
-           [org.opencv.core Core Mat CvType]
+           [org.opencv.core Core Mat CvType MatOfRect Point Scalar]
            [org.opencv.imgcodecs Imgcodecs]
            [org.opencv.imgproc Imgproc]
+           [org.opencv.objdetect CascadeClassifier]
            [org.opencv.videoio VideoCapture])
   (:require [clojure.core.async :as async]))
 
 (def j-frame (new JFrame))
 (def mat-frame (new Mat))
 (def cv-camera (new VideoCapture 0))
+(def face-detector (new CascadeClassifier "resources/lbpcascade_frontalface.xml"))
+(def face-detections (new MatOfRect))
 
 (defn mat->buffered-image [mat]
   (let [gray? (= (.channels mat) 1)
@@ -44,12 +47,23 @@
   (when close-operation
     (.setDefaultCloseOperation j-frame close-operation)))
 
+(defn check-faces [mat-frame]
+  (.detectMultiScale face-detector mat-frame face-detections)
+  #_(prn :face-count (.size (.toList face-detections)))
+  (doall
+   (for [rect (.toArray face-detections)]
+     (Imgproc/rectangle mat-frame
+                        (new Point (.-x rect) (.-y rect))
+                        (new Point (+ (.-x rect) (.-width rect)) (+ (.-y rect) (.-height rect)))
+                        (new Scalar 0, 255, 0)))))
+
 (defn -main []
   (prn :start-main)
   (if (.isOpened cv-camera)
     (loop [take 0]
       (.read cv-camera mat-frame)
       #_(Imgcodecs/imwrite "capture.jpg" mat-frame)
+      (check-faces mat-frame)
       (if (= (.getTitle j-frame) "")
         (show-mat j-frame mat-frame
                   :title "captured camera image on opencv in clojure"

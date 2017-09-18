@@ -1,6 +1,6 @@
-# clj-opencv-swing-example
+# clj-opencv-videocapture-example
 
-A Clojure project to use opencv and swing.
+A Clojure project of video capturing with using opencv.
 
 # Usage
 

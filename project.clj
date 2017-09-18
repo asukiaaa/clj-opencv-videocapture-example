@@ -1,4 +1,4 @@
-(defproject clj-opencv-swing-example "0.1.0-SNAPSHOT"
+(defproject clj-opencv-videocapture-example "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -8,4 +8,4 @@
   :jvm-opts ["-Djava.library.path=lib"]
   :resource-paths ["lib/opencv-320.jar"]
   :injections [(clojure.lang.RT/loadLibrary org.opencv.core.Core/NATIVE_LIBRARY_NAME)]
-  :main clj-opencv-swing-example.core)
+  :main clj-opencv-videocapture-example.core)

@@ -1,4 +1,4 @@
-(ns clj-opencv-swing-example.core
+(ns clj-opencv-videocapture-example.core
   (:import [java.awt.image BufferedImage]
            [javax.swing JFrame JLabel ImageIcon WindowConstants SwingUtilities]
            [org.opencv.core Core Mat CvType MatOfRect Point Scalar]

@@ -1,6 +1,7 @@
 # clj-opencv-videocapture-example
 
 A Clojure project of video capturing with using opencv.
+This project was forked from [clj-opencv-swing-example](https://github.com/asukiaaa/clj-opencv-swing-example).
 
 # Usage
 

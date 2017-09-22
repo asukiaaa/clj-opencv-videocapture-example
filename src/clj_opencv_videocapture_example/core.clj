@@ -6,7 +6,9 @@
            [org.opencv.imgproc Imgproc]
            [org.opencv.objdetect CascadeClassifier]
            [org.opencv.videoio VideoCapture])
-  (:require [clojure.core.async :as async]))
+  (:require [clojure.core.async :as async]
+            [clj-time.core :as t]
+            [clj-time.local :as l]))
 
 (def j-frame (new JFrame))
 (def mat-frame (new Mat))
@@ -30,11 +32,15 @@
     (System/arraycopy buffer 0 target-pixels 0 (alength buffer))
     image))
 
-(defn show-mat [j-frame mat & {:keys [title set-visible close-operation]}]
+(defn config-j-frame [j-frame & {:keys [title set-visible close-operation]}]
   (when title
     (.setTitle j-frame title))
   (when-not (nil? set-visible)
     (.setVisible j-frame set-visible))
+  (when close-operation
+    (.setDefaultCloseOperation j-frame close-operation)))
+
+(defn show-mat [j-frame mat]
   (-> j-frame
       (.getContentPane)
       (.removeAll))
@@ -43,9 +49,7 @@
                    (new ImageIcon)
                    (new JLabel)))
   (.revalidate j-frame)
-  (.repaint j-frame)
-  (when close-operation
-    (.setDefaultCloseOperation j-frame close-operation)))
+  (.repaint j-frame))
 
 (defn check-faces [mat-frame]
   (.detectMultiScale face-detector mat-frame face-detections)
@@ -57,18 +61,30 @@
                         (new Point (+ (.-x rect) (.-width rect)) (+ (.-y rect) (.-height rect)))
                         (new Scalar 0, 255, 0)))))
 
+(defn show-fps [mat-frame fps]
+  (Imgproc/putText mat-frame
+                   (str fps "fps")
+                   (new Point 10 40)
+                   Core/FONT_HERSHEY_SIMPLEX
+                   1                  ; Scale
+                   (new Scalar 0 0 0) ; Color
+                   4))                ; Thickness
+
 (defn -main []
   (prn :start-main)
-  (if (.isOpened cv-camera)
-    (loop [take 0]
-      (.read cv-camera mat-frame)
-      #_(Imgcodecs/imwrite "capture.jpg" mat-frame)
-      (check-faces mat-frame)
-      (if (= (.getTitle j-frame) "")
-        (show-mat j-frame mat-frame
+  (config-j-frame j-frame
                   :title "captured camera image on opencv in clojure"
                   :set-visible true
                   :close-operation WindowConstants/EXIT_ON_CLOSE)
-        (show-mat j-frame mat-frame))
-      (recur (inc take))))
+  (if (.isOpened cv-camera)
+    (loop [times-in-sec []]
+      (let [one-sec-ago (t/minus (l/local-now) (t/seconds 1))
+            times-in-sec (->> (conj times-in-sec (l/local-now))
+                              (filter #(t/before? one-sec-ago %)))]
+        (.read cv-camera mat-frame)
+        (check-faces mat-frame)
+        (show-fps mat-frame (count times-in-sec))
+        (show-mat j-frame mat-frame)
+        #_(Imgcodecs/imwrite "capture.jpg" mat-frame)
+        (recur times-in-sec))))
   (prn :cannot-open-camera))

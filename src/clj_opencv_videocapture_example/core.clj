@@ -70,6 +70,10 @@
                    (new Scalar 0 0 0) ; Color
                    4))                ; Thickness
 
+(defn one-line-log [fps]
+  (print "\r" (format "%3dfps" fps))
+  (flush))
+
 (defn -main []
   (prn :start-main)
   (config-j-frame j-frame
@@ -80,10 +84,12 @@
     (loop [times-in-sec []]
       (let [one-sec-ago (t/minus (l/local-now) (t/seconds 1))
             times-in-sec (->> (conj times-in-sec (l/local-now))
-                              (filter #(t/before? one-sec-ago %)))]
+                              (filter #(t/before? one-sec-ago %)))
+            fps (count times-in-sec)]
+        (one-line-log fps)
         (.read cv-camera mat-frame)
         (check-faces mat-frame)
-        (show-fps mat-frame (count times-in-sec))
+        (show-fps mat-frame fps)
         (show-mat j-frame mat-frame)
         #_(Imgcodecs/imwrite "capture.jpg" mat-frame)
         (recur times-in-sec))))

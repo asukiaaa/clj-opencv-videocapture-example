@@ -92,5 +92,5 @@
         (show-fps mat-frame fps)
         (show-mat j-frame mat-frame)
         #_(Imgcodecs/imwrite "capture.jpg" mat-frame)
-        (recur times-in-sec))))
-  (prn :cannot-open-camera))
+        (recur times-in-sec)))
+    (prn :cannot-open-camera)))

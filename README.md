@@ -37,6 +37,13 @@ cp ~/gitprojects/opencv_source/build/bin/opencv-340.jar lib/
 cp ~/gitprojects/opencv_source/build/lib/libopencv_java340.so lib/ # for linux
 ```
 
+For ubuntu17.10, run following command to activate stack guard.
+```
+sudo apt install execstack
+cd [this proejct dir]
+execstack -c lib/libopencv_java340.so
+```
+
 ## Run
 ```
 cd [this project dir]

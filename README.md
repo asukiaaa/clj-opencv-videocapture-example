@@ -10,7 +10,7 @@ This project was forked from [clj-opencv-swing-example](https://github.com/asuki
 For ubuntu17.10.
 
 ```
-sudo apt install cmake ant openjdk-8-jdk
+sudo apt install build-essential cmake openjdk-8-jdk ant
 mkdir gitprojects
 cd gitprojects
 # clone version 3.4.0 source

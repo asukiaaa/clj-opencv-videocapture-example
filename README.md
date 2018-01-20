@@ -7,16 +7,15 @@ This project was forked from [clj-opencv-swing-example](https://github.com/asuki
 
 ## Compile opencv files for java
 
-For ubuntu16.10.
+For ubuntu17.10.
 
 ```
 sudo apt install cmake ant openjdk-8-jdk
 mkdir gitprojects
 cd gitprojects
-git clone git@github.com:opencv/opencv.git opencv_source
+# clone version 3.4.0 source
+git clone --branch 3.4.0 --depth 1 git@github.com:opencv/opencv.git opencv_source
 cd opencv_source
-git checkout tags/3.2.0
-# git fetch -p # if you cannot find 3.2.0 tag
 mkdir build
 cd build
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
@@ -30,12 +29,12 @@ make -j4
 cd [this proejct dir]
 mkdir lib
 # jar file
-cp ~/gitprojects/opencv_source/build/bin/opencv-320.jar lib/
+cp ~/gitprojects/opencv_source/build/bin/opencv-340.jar lib/
 
 # needs so file for linux
 # needs dylib file for mac
 # needs dll file for windows
-cp ~/gitprojects/opencv_source/build/lib/libopencv_java320.so lib/ # for linux
+cp ~/gitprojects/opencv_source/build/lib/libopencv_java340.so lib/ # for linux
 ```
 
 ## Run
@@ -61,3 +60,4 @@ Distributed under the Eclipse Public License either version 1.0 or (at your opti
 - [how to show imagebuffer to jframe](http://stackoverflow.com/questions/299495/how-to-add-an-image-to-a-jpanel)
 - [ImShow-Java-OpenCV](https://github.com/master-atul/ImShow-Java-OpenCV/blob/master/ImShow_JCV/src/com/atul/JavaOpenCV/Imshow.java)
 - [content pane remove all](http://stackoverflow.com/questions/9347076/how-to-remove-all-components-from-a-jframe-in-java)
+- [How to git clone a specific tag](https://stackoverflow.com/questions/20280726/how-to-git-clone-a-specific-tag/24102558)

@@ -7,6 +7,6 @@
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/core.async "0.3.442"]]
   :jvm-opts ["-Djava.library.path=lib"]
-  :resource-paths ["lib/opencv-320.jar"]
+  :resource-paths ["lib/opencv-340.jar"]
   :injections [(clojure.lang.RT/loadLibrary org.opencv.core.Core/NATIVE_LIBRARY_NAME)]
   :main clj-opencv-videocapture-example.core)

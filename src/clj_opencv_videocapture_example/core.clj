@@ -46,8 +46,8 @@
       (.removeAll))
   (.setSize j-frame (.width mat) (.height mat))
   (.add j-frame (->> (mat->buffered-image mat)
-                   (new ImageIcon)
-                   (new JLabel)))
+                     (new ImageIcon)
+                     (new JLabel)))
   (.revalidate j-frame)
   (.repaint j-frame))
 

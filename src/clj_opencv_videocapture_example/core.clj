@@ -28,14 +28,11 @@
                   (not= (.getType @buffered-image) type)))
       (prn :update-buffered-image)
       (reset! buffered-image (new BufferedImage (.width mat) (.height mat) type)))
-    (let [target-pixels (-> @buffered-image
-                            (.getRaster)
-                            (.getDataBuffer)
-                            (.getData))
-          buffer (byte-array (* (.width mat) (.height mat) (if gray? 1 3)))]
-      (.get mat 0 0 buffer)
-      (System/arraycopy buffer 0 target-pixels 0 (alength buffer))
-      @buffered-image)))
+    (.get mat 0 0 (-> @buffered-image
+                      (.getRaster)
+                      (.getDataBuffer)
+                      (.getData)))
+    @buffered-image))
 
 (defn config-j-frame [j-frame & {:keys [title set-visible close-operation]}]
   (when title

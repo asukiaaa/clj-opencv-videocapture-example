@@ -15,46 +15,29 @@
 (def cv-camera (new VideoCapture 0))
 (def face-detector (new CascadeClassifier "resources/lbpcascade_frontalface.xml"))
 (def face-detections (new MatOfRect))
-(def buffered-image (atom nil))
 
-(defn mat->buffered-image [mat]
+(defn create-buffered-image [mat]
   (let [gray? (= (.channels mat) 1)
         type (if gray?
                BufferedImage/TYPE_BYTE_GRAY
                BufferedImage/TYPE_3BYTE_BGR)]
-    (when (or (= @buffered-image nil)
-              (or (not= (.getWidth @buffered-image) (.width mat))
-                  (not= (.getHeight @buffered-image) (.height mat))
-                  (not= (.getType @buffered-image) type)))
-      (prn :update-buffered-image)
-      (reset! buffered-image (new BufferedImage (.width mat) (.height mat) type)))
-    (.get mat 0 0 (-> @buffered-image
-                      (.getRaster)
-                      (.getDataBuffer)
-                      (.getData)))
-    @buffered-image))
+    (new BufferedImage (.width mat) (.height mat) type)))
 
-(defn config-j-frame [j-frame & {:keys [title set-visible close-operation]}]
+(defn update-buffered-image [buffered-image mat]
+  (.get mat 0 0 (-> buffered-image
+                    (.getRaster)
+                    (.getDataBuffer)
+                    (.getData))))
+
+(defn config-j-frame [j-frame & {:keys [title set-visible close-operation width height]}]
   (when title
     (.setTitle j-frame title))
   (when-not (nil? set-visible)
     (.setVisible j-frame set-visible))
   (when close-operation
-    (.setDefaultCloseOperation j-frame close-operation)))
-
-(defn show-mat [j-frame mat]
-  #_(-> j-frame
-      (.getContentPane)
-      (.removeAll))
-  (if (= @buffered-image nil)
-    (do
-      (.setSize j-frame (.width mat) (.height mat))
-      (.add (.getContentPane j-frame) (->> (mat->buffered-image mat)
-                                           (new ImageIcon)
-                                           (new JLabel)))
-      (.revalidate j-frame))
-    (mat->buffered-image mat))
-  (.repaint j-frame))
+    (.setDefaultCloseOperation j-frame close-operation))
+  (when (and width height)
+    (.setSize j-frame width height)))
 
 (defn check-faces [mat-frame]
   (.detectMultiScale face-detector mat-frame face-detections)
@@ -81,21 +64,31 @@
 
 (defn -main []
   (prn :start-main)
-  (config-j-frame j-frame
-                  :title "captured camera image on opencv in clojure"
-                  :set-visible true
-                  :close-operation WindowConstants/EXIT_ON_CLOSE)
   (if (.isOpened cv-camera)
-    (loop [times-in-sec []]
-      (let [one-sec-ago (t/minus (l/local-now) (t/seconds 1))
-            times-in-sec (->> (conj times-in-sec (l/local-now))
-                              (filter #(t/before? one-sec-ago %)))
-            fps (count times-in-sec)]
-        (one-line-log fps)
-        (.read cv-camera mat-frame)
-        (check-faces mat-frame)
-        (show-fps mat-frame fps)
-        (show-mat j-frame mat-frame)
-        #_(Imgcodecs/imwrite "capture.jpg" mat-frame)
-        (recur times-in-sec)))
+    (do
+      (.read cv-camera mat-frame)
+      (prn :width (.width mat-frame) :height (.height mat-frame))
+      #_(Imgcodecs/imwrite "capture.jpg" mat-frame)
+      (config-j-frame j-frame
+                      :title "captured camera image on opencv in clojure"
+                      :set-visible true
+                      :close-operation WindowConstants/EXIT_ON_CLOSE
+                      :width (.width mat-frame) :height (.height mat-frame))
+      (let [buffered-image (create-buffered-image mat-frame)]
+        (.add (.getContentPane j-frame) (->> buffered-image
+                                             (new ImageIcon)
+                                             (new JLabel)))
+        (.revalidate j-frame)
+        (loop [times-in-sec []]
+          (let [one-sec-ago (t/minus (l/local-now) (t/seconds 1))
+                times-in-sec (->> (conj times-in-sec (l/local-now))
+                                  (filter #(t/before? one-sec-ago %)))
+                fps (count times-in-sec)]
+            (one-line-log fps)
+            (.read cv-camera mat-frame)
+            (check-faces mat-frame)
+            (show-fps mat-frame fps)
+            (update-buffered-image buffered-image mat-frame)
+            (.repaint j-frame)
+            (recur times-in-sec)))))
     (prn :cannot-open-camera)))

@@ -56,6 +56,7 @@ Distributed under the Eclipse Public License either version 1.0 or (at your opti
 
 # References
 
+- [clojureでopencv javaを利用して、カメラで取得した画像に対して顔検出を行う方法](http://asukiaaa.blogspot.com/2018/01/clojureopencv-java.html)
 - [Install commands example](https://github.com/milq/milq/blob/master/scripts/bash/install-opencv.sh)
 - [opencv for java](http://docs.opencv.org/3.0-beta/doc/tutorials/introduction/desktop_java/java_dev_intro.html)
 - [play opencv in clojure](http://keens.github.io/blog/2015/06/07/clojuredeopencv3_0totawamureru/)
